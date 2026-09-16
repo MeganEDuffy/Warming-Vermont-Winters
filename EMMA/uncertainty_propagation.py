@@ -1,7 +1,7 @@
 """
 uncertainty_propagation.py
 Propagates 1-sigma uncertainty for EMMA mixing fractions using numerical 
-differentiation, matching the mathematical framework of Genereux (1998).
+differentiation, similar to framework of Genereux (1998).
 """
 
 import numpy as np

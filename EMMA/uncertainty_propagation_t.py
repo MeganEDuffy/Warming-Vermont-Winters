@@ -1,7 +1,7 @@
 """
 uncertainty_propagation.py
 Propagates uncertainty for EMMA mixing fractions using numerical differentiation 
-and Student's t-statistics, matching the mathematical framework of Genereux (1998).
+and Student's t-statistics, similar to the framework of Genereux (1998).
 """
 
 import numpy as np
@@ -54,7 +54,7 @@ def propagate_genereux_uncertainty(
         em_raw (DataFrame): Raw end-member samples (used to compute sample SD and n).
         tracers (list): List of tracers to use in calculations.
         analytical_sd (dict): Analytical standard deviations for stream tracers.
-        confidence_level (float): Target confidence level (default 0.70 as per Genereux).
+        confidence_level (float): Target confidence level (default 0.70).
         epsilon (float): Step size for numerical partial derivatives.
 
     Returns:
@@ -69,7 +69,7 @@ def propagate_genereux_uncertainty(
     n_sources = len(sources)
     n_tracers = len(tracers)
 
-    # 1. Compute Sample Sizes (n) and Standard Deviations (s) for End-Members
+    # 1. Compute Sample Sizes (n) and Standard Deviations (s) for end-members
     em_counts = em_raw.groupby("Type")[tracers].count()
     em_sd = em_raw.groupby("Type")[tracers].std()
 
@@ -87,9 +87,11 @@ def propagate_genereux_uncertainty(
             sample_sd = em_sd.loc[source, col] if source in em_sd.index else np.nan
 
             if pd.isna(sample_sd) or n_samples <= 1:
-                # Fallback for n = 1 (e.g., 10% coefficient of variation of the mean)
+                # Fallback for n = 1 (e.g., coefficient of variation of the mean)
                 mean_val = em_grouped.loc[em_grouped["Type"] == source, col].values[0]
-                fallback_s = abs(mean_val) * 0.1  # Coefficient of variation derived from RI25 end-member samples
+                fallback_s = abs(mean_val) * 0.39  # coefficient of variation derived from RI25 end-member samples. 
+                # Grouped CoV derived from analysis of baseflow, snmowlet, and soil water samples taken on consecutive days.
+                # See notebooks on Wade and Hungerford end-member tracer variation.
                 
                 # For n=1, degrees of freedom = 1 (or small-sample proxy). 
                 # Using df=1 with two-tailed alpha=0.30 gives t ≈ 1.963
@@ -127,7 +129,7 @@ def propagate_genereux_uncertainty(
         # Variance accumulations for each source fraction [Var_f1, Var_f2, ...]
         variance_accum = np.zeros(n_sources)
 
-        # --- PART A: Derivatives w.r.t Stream Mixture Tracers (C_m) ---
+        # --- PART A: Derivatives w.r.t stream mxture tracers (C_m) ---
         # Note: Stream analytical errors can also be scaled by normal/t distributions, 
         # but stream measurement replicates often use standard analytical precision (1-sigma ~ normal).
         for j, tracer in enumerate(tracers):
@@ -164,7 +166,7 @@ def propagate_genereux_uncertainty(
         W_f = np.sqrt(variance_accum)
         uncertainty_results.append(W_f)
 
-    # 3. Assemble Output DataFrame
+    # 3. Assemble output dataFrame
     uncertainties_matrix = np.vstack(uncertainty_results)
     cols = [f"{source}_Uncertainty_{int(confidence_level*100)}sig" for source in sources]
 
