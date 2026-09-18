@@ -16,6 +16,7 @@ All data used in analyses can be found in Data\
 - Soil temperature and moisture data in SoilSensor_data\
 - Soil-available nutrient data from in situ ion exchange resin capsules ("soil resins") in SoilNutrient_data\
 - Stream and end-member chemistry data (major cations and anions, trace metals, stable isotopes of water) in GrabSample_data\
+-   All stream and end-member chemistry from Winter 2022-23 in RI23-IC-ICP-isotope-toc-joined.csv
 - Integrated water and solute yields for selected winter-to-spring runoff events in EventYield_data\
 
 ### Analysis modules:
