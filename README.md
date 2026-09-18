@@ -1,6 +1,6 @@
 ## Divergent patterns of soil-stream connectivity during mid-winter runoff events between two catchments in the northeastern USA 
 
-### Megan E. Duffy
+### Megan E. Duffy (megan dot duffy at uvm dot edu)
 
 ### Rubenstein School of Environment and Natural Resources, University of Vermont, Burlington, VT, USA.
 
