@@ -27,3 +27,4 @@ All data used in analyses can be found in Data\
 ### Notebooks to run all analyses
 
 - Jupyter notebooks to apply the above modules and data are contained in Notebooks\
+- conda environment files provided upon request.
