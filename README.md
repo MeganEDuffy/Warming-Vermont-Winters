@@ -21,9 +21,9 @@ All data used in analyses can be found in Data\
 
 ### Analysis modules:
 
-- Python module for end-member mixing analysis (EMMA) principle components analysis (PCA) and hydrograph separation steps in EMMA\
-- R function to process and plot stream sensor data, soil sensor data, stream and end-member solute data, and EMMA output in Functions\
-- R function to pull USGS Gauge discharge data from 1928-2025 in Functions\
+- Python (v3.13.2) module for end-member mixing analysis (EMMA) principle components analysis (PCA) and hydrograph separation steps in EMMA\
+- R (v4.2.0) function to process and plot stream sensor data, soil sensor data, stream and end-member solute data, and EMMA output in Functions\
+- R (v4.3.1) function to pull USGS Gauge discharge data from 1928-2025 using `USGS dataretrieval` package (v1.0.12) in Functions\
 
 ### Notebooks to run all analyses
 
