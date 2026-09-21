@@ -116,12 +116,12 @@ def plot_event_pca_with_avgEM(
 
     # --- set font sizes globally (scale ~1.5× default) ---
     mpl.rcParams.update({
-        "font.size": 18,          # base font size
-        "axes.titlesize": 18,     # title
-        "axes.labelsize": 18,     # x and y labels
-        "xtick.labelsize": 16,    # tick labels
-        "ytick.labelsize": 16,
-        "legend.fontsize": 18
+        "font.size": 30,          # base font size
+        "axes.titlesize": 28,     # title
+        "axes.labelsize": 28,     # x and y labels
+        "xtick.labelsize": 25,    # tick labels
+        "ytick.labelsize": 25,
+        "legend.fontsize": 25
     })
 
     # Streamwater points
@@ -183,7 +183,7 @@ def plot_event_pca_with_avgEM(
     filename = f"{site}_{save_event_name}.jpg"
     output_path = os.path.join("/home/millieginty/OneDrive/git-repos/LCBP-interannual-EMMAs/Output/PCA-Mixing", filename)
 
-    ax.legend(bbox_to_anchor=(1.02, 1.02), loc="upper left")
+    #ax.legend(bbox_to_anchor=(1.02, 1.02), loc="upper left") # Uncomment to get legend and manually input into composite figure
     plt.tight_layout()
 
     fig.savefig(output_path, dpi=300)
@@ -398,12 +398,12 @@ def plot_event_pca_explore_samples(
     fig, ax = plt.subplots(figsize=(8, 8))
     
     mpl.rcParams.update({
-        "font.size": 16,
-        "axes.titlesize": 16,
-        "axes.labelsize": 16,
-        "xtick.labelsize": 14,
-        "ytick.labelsize": 14,
-        "legend.fontsize": 14
+        "font.size": 20,
+        "axes.titlesize": 18,
+        "axes.labelsize": 18,
+        "xtick.labelsize": 16,
+        "ytick.labelsize": 16,
+        "legend.fontsize": 16
     })
 
     # Plot event streamwater background cloud (markers)
