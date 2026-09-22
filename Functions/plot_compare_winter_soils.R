@@ -12,7 +12,7 @@ plot_compare_winter_soils <- function(site1_name, met_file1, snow_file1, soil_fi
                                       site1_samp_dates = NULL, 
                                       site2_samp_dates = NULL, 
                                       plot_range = c("2022-06-01", "2023-04-30"),
-                                      base_font_size = 14) {
+                                      base_font_size = 16) {
   
   # -------------------------------------------------------------------
   # 1. TIME BOUNDS & DATE PREP
@@ -163,6 +163,9 @@ plot_compare_winter_soils <- function(site1_name, met_file1, snow_file1, soil_fi
   # -------------------------------------------------------------------
   build_site_panels <- function(site_n, dat_m, dat_m_daily, dat_sn, dat_sl_6, dat_sl_15, dat_q, v_col6, t_col6, samp_dates) {
     
+    # Left margin control
+    subplot_margin <- margin(t = 5, r = 15, b = 5, l = 45, unit = "pt")
+    
     shading_layer <- NULL
     if (!is.null(samp_dates) && nrow(samp_dates) > 0) {
       shading_layer <- geom_rect(
@@ -183,12 +186,13 @@ plot_compare_winter_soils <- function(site1_name, met_file1, snow_file1, soil_fi
         sec.axis = sec_axis(~ temp_min + (max_p - .) * (temp_range / max_p), name = "Air Temp (°C)")
       ) +
       scale_x_datetime(limits = c(start_date, end_date), date_labels = "") +
-      labs(title = paste(site_n, "- Total precip & daily air temp")) +
+      labs(title = paste(site_n, "- Total precip. & daily air temp.")) +
       theme_minimal(base_size = base_font_size) +
       theme(
         axis.title.x = element_blank(), axis.text.x = element_blank(),
         axis.title.y.right = element_text(color = "firebrick"),
-        axis.title.y.left = element_text(color = "#2F4F4F")
+        axis.title.y.left = element_text(color = "#2F4F4F"),
+        plot.margin = subplot_margin
       )
     
     # Panel B: Snowpack Depth & Discharge
@@ -202,13 +206,14 @@ plot_compare_winter_soils <- function(site1_name, met_file1, snow_file1, soil_fi
         sec.axis = sec_axis(~ . * (fixed_max_q / max_snow), name = "Discharge (cms)")
       ) +
       scale_x_datetime(limits = c(start_date, end_date), date_labels = "") +
-      labs(title = paste(site_n, "- Snowpack depth & discharge")) +
+      labs(title = paste(site_n, "- Stream discharge & snowpack depth")) +
       theme_minimal(base_size = base_font_size) +
       theme(
         axis.title.x = element_blank(), 
         axis.text.x = element_blank(),
         axis.title.y.left = element_text(color = "blue4"),
-        axis.title.y.right = element_text(color = "black")
+        axis.title.y.right = element_text(color = "black"),
+        plot.margin = subplot_margin
       )
     
     # Panel C: Consolidated Soil Panel (6 cm & 15 cm with depth line-weight distinction)
@@ -226,53 +231,92 @@ plot_compare_winter_soils <- function(site1_name, met_file1, snow_file1, soil_fi
         name = "VWC (0-1)", limits = c(min_y_limit, max_vwc),
         sec.axis = sec_axis(~ . * soil_scale, name = "Soil Temp (°C)")
       ) +
-      scale_x_datetime(limits = c(start_date, end_date), date_labels = "%b %Y") +
+      scale_x_datetime(
+        limits = c(start_date, end_date), 
+        date_breaks = "1 month", 
+        date_labels = "%b"
+      ) +
       labs(
-        title = bquote(.(paste0(site_n, " - Soil moisture & temp (6 cm &")) ~ bold("15 cm") * ")"), 
-        x = "Date"
+        title = bquote(.(paste0(site_n, " - Soil moisture & temp. (6 &")) ~ bold("15 cm") * ")"), 
+        x = ""
       ) +
       theme_minimal(base_size = base_font_size) +
       theme(
+        axis.text.x = element_text(angle = 30, hjust = 1),
         axis.title.y.left = element_text(color = "dodgerblue3"),
-        axis.title.y.right = element_text(color = "darkorange3")
+        axis.title.y.right = element_text(color = "darkorange3"),
+        plot.margin = subplot_margin
       )
     
-    make_boxplot <- function(species_name, y_limit) {
+    # Helper for Boxplots with invisible secondary Y-axis to match high res data panels' x-axis plotting width
+    make_boxplot <- function(species_name, y_limit, display_label) {
       dat_sub <- dat_resin %>% filter(Site == site_n & Species == species_name)
       ggplot(dat_sub, aes(x = month_label, y = ug_cm2_month)) +
         geom_boxplot(outlier.shape = NA, fill = "gray90", color = "black") +
         scale_x_discrete(drop = FALSE) +
-        ylim(0, y_limit) + 
-        labs(title = paste(site_n, "-", species_name), x = NULL, y = "µg/cm²/month") +
+        scale_y_continuous(
+          limits = c(0, y_limit),
+          sec.axis = sec_axis(~ ., name = "") # Reserve right margin space matching top plots
+        ) +
+        labs(
+          title = paste0(site_n, ", ", display_label), 
+          x = NULL, 
+          y = "µg/cm²/month"
+        ) +
         theme_minimal(base_size = base_font_size) +
-        theme(axis.text.x = element_text(angle = 30, hjust = 1))
+        theme(
+          axis.text.x = element_text(angle = 30, hjust = 1),
+          plot.margin = subplot_margin
+        )
     }
     
-    p_nh4 <- make_boxplot("Ammonium", 30)
-    p_no3 <- make_boxplot("Nitrate", 50)
-    p_po4 <- make_boxplot("Phosphate", 15)
+    p_nh4 <- make_boxplot("Ammonium", 30, "soil-available ammonium")
+    p_no3 <- make_boxplot("Nitrate", 50, "soil-available nitrate")
+    p_po4 <- make_boxplot("Phosphate", 15, "soil-available phosphate")
     
     return(list(met = p_met, snow = p_snow, soil = p_soil, nh4 = p_nh4, no3 = p_no3, po4 = p_po4))
   }
   
   # -------------------------------------------------------------------
-  # 6. GENERATE PANELS & STITCH WITH COWPLOT (Adjusted for 3 top panels)
+  # 6. GENERATE PANELS & STITCH WITH COWPLOT (Unified alignment across all 6 panels)
   # -------------------------------------------------------------------
   plots1 <- build_site_panels(site1_name, met1$raw, met1$daily, snow1, soil1_6, soil1_15, q1, s_vwc_col1, s_temp_col1, site1_samp_dates)
   plots2 <- build_site_panels(site2_name, met2$raw, met2$daily, snow2, soil2_6, soil2_15, q2, s_vwc_col2, s_temp_col2, site2_samp_dates)
   
-  left_top <- plot_grid(plots1$met, plots1$snow, plots1$soil, ncol = 1, align = "v", rel_heights = c(1, 1, 1.3), labels = c("a)", "b)", "c)"), label_x = -0.02)
-  left_bot <- plot_grid(plots1$nh4, plots1$no3, plots1$po4, ncol = 1, align = "v", labels = c("d)", "e)", "f)"), label_x = -0.02)
-  left_col <- plot_grid(left_top, left_bot, ncol = 1, rel_heights = c(3.0, 1.8))
+  # Align both left and right axis borders across all 6 panels simultaneously
+  left_col <- plot_grid(
+    plots1$met, plots1$snow, plots1$soil, 
+    plots1$nh4, plots1$no3, plots1$po4, 
+    ncol = 1, 
+    align = "v", 
+    axis = "lr",
+    rel_heights = c(1, 1, 1.3, 0.6, 0.6, 0.6), 
+    labels = c("a)", "b)", "c)", "d)", "e)", "f)"), 
+    label_size = 28, 
+    label_x = -0.03
+  )
   
-  right_top <- plot_grid(plots2$met, plots2$snow, plots2$soil, ncol = 1, align = "v", rel_heights = c(1, 1, 1.3), labels = c("g)", "h)", "i)"), label_x = -0.02)
-  right_bot <- plot_grid(plots2$nh4, plots2$no3, plots2$po4, ncol = 1, align = "v", labels = c("j)", "k)", "l)"), label_x = -0.02)
-  right_col <- plot_grid(right_top, right_bot, ncol = 1, rel_heights = c(3.0, 1.8))
+  right_col <- plot_grid(
+    plots2$met, plots2$snow, plots2$soil, 
+    plots2$nh4, plots2$no3, plots2$po4, 
+    ncol = 1, 
+    align = "v", 
+    axis = "lr",
+    rel_heights = c(1, 1, 1.3, 0.6, 0.6, 0.6), 
+    labels = c("g)", "h)", "i)", "j)", "k)", "l)"), 
+    label_size = 28, 
+    label_x = -0.03
+  )
   
-  final_composite <- plot_grid(left_col, right_col, ncol = 2)
+  # Insert NULL spacer column with rel_widths to control horizontal gutter
+  final_composite <- plot_grid(
+    left_col, NULL, right_col, 
+    ncol = 3, 
+    rel_widths = c(1, 0.1, 1)
+  )
   
   padded_final <- ggdraw(final_composite) +
-    theme(plot.margin = margin(t = 10, r = 15, b = 10, l = 25, unit = "pt"))
+    theme(plot.margin = margin(t = 10, r = 20, b = 10, l = 35, unit = "pt"))
   
   return(padded_final)
 }
