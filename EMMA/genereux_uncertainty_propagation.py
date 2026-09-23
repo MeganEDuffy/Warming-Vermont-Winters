@@ -18,10 +18,10 @@ def compute_genereux2022_fractions_and_derivatives(A_S, B_S, A_1, B_1, A_2, B_2,
     derivatives using analytical formulations from Genereux (2022).
     A = PC1 score, B = PC2 score.
     """
-    M1 = A_S*B_2 - A_S*B_3 + A_2*B_3 - A_2*B_S + A_3*B_S - A_3*B_2
-    M2 = A_S*B_3 - A_S*B_1 + A_1*B_S - A_1*B_3 + A_3*B_1 - A_3*B_S
-    M3 = A_S*B_1 - A_S*B_2 + A_1*B_2 - A_1*B_S + A_2*B_S - A_2*B_1
-    M4 = A_1*B_2 - A_1*B_3 + A_2*B_3 - A_2*B_1 + A_3*B_1 - A_3*B_2
+    M1 = A_S*B_2 - A_S*B_3 + A_2*B_3 - A_2*B_S + A_3*B_S - A_3*B_2 # Eq. 1
+    M2 = A_S*B_3 - A_S*B_1 + A_1*B_S - A_1*B_3 + A_3*B_1 - A_3*B_S # Eq. 2
+    M3 = A_S*B_1 - A_S*B_2 + A_1*B_2 - A_1*B_S + A_2*B_S - A_2*B_1 # Eq. 3
+    M4 = A_1*B_2 - A_1*B_3 + A_2*B_3 - A_2*B_1 + A_3*B_1 - A_3*B_2 # Eq. 4
 
     f1, f2, f3 = M1 / M4, M2 / M4, M3 / M4
     M4_sq = M4**2
@@ -155,7 +155,7 @@ def propagate_genereux2022_pca_uncertainty(
     W_A2, W_B2 = W_em[(sources[1], "PC1")], W_em[(sources[1], "PC2")]
     W_A3, W_B3 = W_em[(sources[2], "PC1")], W_em[(sources[2], "PC2")]
 
-    W_vector = np.array([W_AS, W_A1, W_A2, W_A3, W_BS, W_B1, W_B2, W_B3])
+    W_vector = np.array([W_AS, W_A1, W_A2, W_A3, W_BS, W_B1, W_B2, W_B3]) # Eq 29-31 WY computed using vector operation
 
     results = []
 
