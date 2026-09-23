@@ -73,8 +73,8 @@ def propagate_genereux2022_pca_uncertainty(
     tracers,
     scaler,
     pca,
-    pc_analytical_sd={'PC1': 0.05, 'PC2': 0.05},
-    confidence_level=0.70,
+    pc_analytical_sd={'PC1': 0.05, 'PC2': 0.05}, # default; the calculated end-member sd values from 2025 are much greater
+    confidence_level=0.70, # default - can compute multiple confidence levels in function call
 ):
     # Extract exact tracer order expected by fitted scaler
     if hasattr(scaler, "feature_names_in_"):
